@@ -1,0 +1,50 @@
+name: Rust
+
+on:
+  push:
+    branches: [ "main", "plutus" ]
+  pull_request:
+    branches: [ "main", "plutus" ]
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: full
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+          components: rustfmt
+      - run: rustup set auto-self-update disable
+      - uses: Swatinem/rust-cache@v2
+      - name: Show env
+        run: |
+          env|sort
+          echo
+          rustc -Vv
+          echo
+          cargo -Vv
+          echo
+          uname -a
+      - name: Run linters
+        run: |
+          cargo check --all
+          cargo fmt --all -- --check
+          cargo clippy -- -D warnings
+      - name: Build
+        run: cargo build --verbose
+      - name: Run tests
+        run: cargo test --verbose
+      - name: Run example (parse)
+        run: cargo run --example parse
+      - name: Run example (parse_function)
+        run: cargo run --example parse_function

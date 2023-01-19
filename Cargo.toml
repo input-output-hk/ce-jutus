@@ -1,0 +1,62 @@
+[package]
+name = "jutus"
+version = "0.1.0"
+edition = "2021"
+authors = ["Christos KK Loverdos"]
+license = "Apache-2.0"
+description = "Plutus for the Masses - Writing Javascript/Typescript, compiling to UPLC"
+keywords = ["plutus", "uplc", "cardano", "smart", "contract", "blockchain", "web3", "web3000"]
+categories = [ "compiler" ]
+readme = "README.md"
+
+[profile.release]
+opt-level = "z" # size
+lto = true
+codegen-units = 1
+panic = "abort"
+
+[dependencies]
+serde = { version = "1.0.147", features = ["rc"] }
+
+########################################################
+# This is the JS ecosystem workhorse.
+# We use the parsing technology of SWC to create a
+# JS-friendly Plutus experience.
+# So, this is the frontend.
+########################################################
+swc_core = { version = "0.43.18", features = ["plugin_transform", "ecma_parser_typescript", "ecma_transforms_react"] }
+
+########################################################
+# This is the Plutus Core workhorse.
+# Basically, Plutus Core encoding in Rust (+ utilities)
+########################################################
+aiken-lang = { git = "https://github.com/aiken-lang/aiken.git", rev = "43ff66c"}
+aiken-project = { git = "https://github.com/aiken-lang/aiken.git", rev = "43ff66c" }
+uplc = { git = "https://github.com/aiken-lang/aiken.git", rev = "43ff66c"}
+aiken = { git = "https://github.com/aiken-lang/aiken.git", rev = "43ff66c"}
+
+# These are used only because we need to copy some code from Aiken (see copy_aiken_project_lib.rs)
+regex = "1.6.0"
+walkdir = "2.3.2"
+hex = "0.4.3"
+pallas = "0.14.0"
+pallas-traverse = "0.14.0"
+miette = { version = "5.3.0", features = ["fancy"] }
+
+########################################################
+# Other dependencies
+########################################################
+# inline strings with the intended indentation (yeah this expression is a feature, try and say it)
+indoc = "1.0.7"
+
+# for automatic json serialization, used in pretty-printing
+serde_json = "1.0.87"
+serde_derive = "1.0.147"
+
+# BigInt
+num-bigint = "0.4.3"
+
+# Vector with at least one item
+vec1 = "1.10.1"
+
+thiserror = "1.0.37"
