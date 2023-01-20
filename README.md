@@ -32,6 +32,9 @@ end-to-end compilation pipeline. Our strategy is as follows:
   (UPLC) representation. From here it should be straightforward
   (via `aiken` again) to generate the binary representation of UPLC.
 
+You may want to check the section on [architecture](#architecture) for a
+visualization of the above.
+
 This is a feasibility study and a proof-of-concept, and, as such, not ready
 for production. But the results are positive, in the sense we prove that
 the original idea is doable. We can also take the whole work a step
@@ -45,3 +48,39 @@ with a huge ecosystem.
 Please check the examples folder if you want to follow the logic of how
 everything fits together. The whole compilation pipeline can also be
 seen encoded as `pub fn end_to_end` in `js_compiler.rs`.
+
+#### Architecture
+
+Here is the general compilation pipeline architecture. Dotted lines denote
+something enabled by this project but not implemented yet.
+
+```mermaid
+flowchart LR
+    subgraph "Front-end"
+      A
+      AA
+      AAA
+    end
+    
+    subgraph "Front-end AST"
+      B
+      BBB
+    end
+
+    A([Typescript])  --> B([swc AST])
+    AA([Javascript]) --> B
+    B                --> C([jutus IR])
+
+    
+    AAA(Language X) -..-> BBB("X" AST)
+    BBB         -..-> C
+    
+    C --> D([aiken untyped AST])
+    D --> E([aiken typed AST])
+    E --> F([aiken UPLC AST])
+    F -..-> G([UPLC binary format])
+        
+    subgraph "Back-end AST"
+      F
+    end
+```
